@@ -3,25 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
-use Xendit\Configuration;
-use Xendit\Invoice\InvoiceApi;
-use Xendit\Invoice\CreateInvoiceRequest;
-
-
 use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
-    
-    public function cekXendit()
-{
-    dd(env('XENDIT_SECRET_KEY'));
-}
-
-
-
-/**
-     * Display a listing of the resource.
+    /**
+     * Admin: Daftar semua produk (halaman manage products).
      */
     public function index()
     {
@@ -29,14 +16,17 @@ class ProductController extends Controller
         return view('products.index', compact('products'));
     }
 
+    /**
+     * Customer: Halaman toko — tampilkan semua produk yang tersedia.
+     */
     public function shop()
     {
-    $products = Product::all();
-    return view('shop.index', compact('products'));
+        $products = Product::all();
+        return view('shop.index', compact('products'));
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Admin: Form tambah produk baru.
      */
     public function create()
     {
@@ -44,38 +34,30 @@ class ProductController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Admin: Simpan produk baru ke database.
      */
-   public function store(Request $request)
-{
-    $data = $request->validate([
-        'name' => 'required',
-        'price' => 'required|numeric',
-        'stock' => 'required|numeric',
-        'description' => 'nullable',
-        'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048'
-    ]);
-
-    if ($request->hasFile('image')) {
-        $data['image'] = $request->file('image')->store('products', 'public');
-    }
-
-    Product::create($data);
-
-    return redirect()->route('products.index')
-                     ->with('success', 'Produk berhasil ditambahkan');
-}
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function store(Request $request)
     {
-        // Tidak dipakai
+        $data = $request->validate([
+            'name'        => 'required',
+            'price'       => 'required|numeric',
+            'stock'       => 'required|numeric',
+            'description' => 'nullable',
+            'image'       => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+        ]);
+
+        if ($request->hasFile('image')) {
+            $data['image'] = $request->file('image')->store('products', 'public');
+        }
+
+        Product::create($data);
+
+        return redirect()->route('products.index')
+            ->with('success', 'Produk berhasil ditambahkan');
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Admin: Form edit produk.
      */
     public function edit(string $id)
     {
@@ -84,7 +66,7 @@ class ProductController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * Admin: Update data produk.
      */
     public function update(Request $request, string $id)
     {
@@ -108,7 +90,7 @@ class ProductController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Admin: Hapus produk.
      */
     public function destroy(string $id)
     {
@@ -119,29 +101,9 @@ class ProductController extends Controller
             ->route('products.index')
             ->with('success', 'Produk berhasil dihapus!');
     }
-    public function customerIndex()
-{
-    $products = \App\Models\Product::all();
-    return view('shop.index', compact('products'));
-}
 
-public function bayar(Product $product)
-{
-    Configuration::setXenditKey(env('XENDIT_SECRET_KEY'));
-
-    $apiInstance = new InvoiceApi();
-
-    $createInvoice = new CreateInvoiceRequest([
-        'external_id' => 'INV-' . uniqid(),
-        'amount' => $product->price,
-        'description' => 'Pembelian produk ' . $product->name,
-        'success_redirect_url' => route('shop'),
-    ]);
-
-    $invoice = $apiInstance->createInvoice($createInvoice);
-
-    return redirect($invoice->getInvoiceUrl());
-}
-
-
+    // [CLEANUP] Fungsi cekXendit(), bayar(), dan customerIndex() telah dihapus.
+    // - cekXendit(): hanya dd() untuk debug, tidak diperlukan
+    // - bayar(): dead code yang pakai Invoice API + env() langsung
+    // - customerIndex(): duplikat dari shop()
 }

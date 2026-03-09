@@ -11,9 +11,12 @@ use App\Http\Controllers\ProfileController;
 
 /*
 |--------------------------------------------------------------------------
-| WEBHOOK XENDIT (TIDAK PAKAI AUTH)
+| WEBHOOK XENDIT (TANPA AUTH & TANPA CSRF)
 |--------------------------------------------------------------------------
+| [NOTE] Route ini di luar middleware 'web' group agar tidak kena
+| VerifyCsrfToken. Autentikasi dilakukan via x-callback-token header.
 */
+
 Route::post('/xendit/webhook', [XenditWebhookController::class, 'handle'])
     ->name('xendit.webhook');
 
@@ -46,7 +49,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/shop', [ProductController::class, 'shop'])
         ->name('shop');
 
-    // BELI SEKARANG
+    // [REFACTOR] "Beli Sekarang" — buat order + redirect ke checkout
     Route::post('/shop/bayar/{id}', [OrderController::class, 'buyNow'])
         ->name('shop.bayar');
 
@@ -70,17 +73,18 @@ Route::middleware(['auth'])->group(function () {
     // ===============================
     // CHECKOUT
     // ===============================
-    Route::get('/checkout', [CheckoutController::class,'index'])
+    Route::get('/checkout', [CheckoutController::class, 'index'])
         ->name('checkout');
 
-    Route::post('/checkout/order',[CheckoutController::class,'createOrder'])
+    // [REFACTOR] Route baru: buat order dari cart items
+    Route::post('/checkout/order', [CheckoutController::class, 'createOrder'])
         ->name('checkout.order');
 
 
     // ===============================
     // PAYMENT (XENDIT)
     // ===============================
-    Route::post('/payment/process',[PaymentController::class,'process'])
+    Route::post('/payment/process', [PaymentController::class, 'process'])
         ->name('payment.process');
 
 
@@ -126,4 +130,4 @@ Route::middleware(['auth', 'admin'])
     });
 
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
