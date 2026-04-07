@@ -8,6 +8,7 @@ use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\XenditWebhookController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\AdminOrderController;
 
 /*
 |--------------------------------------------------------------------------
@@ -32,6 +33,9 @@ Route::get('/', function () {
 
 Route::get('/shop', [ProductController::class, 'shop'])
     ->name('shop');
+
+Route::get('/shop/products/{product}', [ProductController::class, 'detail'])
+    ->name('shop.product');
 
 
 /*
@@ -124,6 +128,12 @@ Route::middleware(['auth', 'admin'])
         })->name('dashboard');
 
         Route::resource('/products', ProductController::class);
+
+        Route::get('/orders', [AdminOrderController::class, 'index'])
+            ->name('orders.index');
+
+        Route::get('/orders/{order}', [AdminOrderController::class, 'show'])
+            ->name('orders.show');
     });
 
 

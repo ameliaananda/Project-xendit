@@ -42,7 +42,7 @@
     @if(auth()->user()->role == 'admin')
 
     <div class="text-end mb-3">
-        <a href="{{ route('products.create') }}" class="btn btn-success">
+        <a href="{{ route('admin.products.create') }}" class="btn btn-success">
             ➕ Tambah Produk
         </a>
     </div>
@@ -69,30 +69,30 @@
                     <h5 class="card-title">{{ $product->name }}</h5>
 
                     <p class="fw-bold mb-1">
-                        Rp {{ number_format($product->price) }} / kg
+                        Rp {{ number_format($product->price) }} / {{ $product->unit ?? 'pcs' }}
                     </p>
 
-                    <p class="text-muted">
+                    <p class="text-muted mb-2">
                         Stok: {{ $product->stock }}
                     </p>
 
-                    <!-- MASUK KERANJANG -->
+                    <a href="{{ route('shop.product', $product->id) }}" class="btn btn-outline-secondary mb-2 w-100">
+                        🔍 Detail Produk
+                    </a>
+
                     <form action="{{ route('cart.add', $product->id) }}" method="POST" class="mb-2">
                         @csrf
-                        <button type="submit" class="btn btn-primary w-100">
+                        <button type="submit" class="btn btn-primary w-100" {{ $product->stock < 1 ? 'disabled' : '' }}>
                             🛒 Masuk Keranjang
                         </button>
                     </form>
 
-                    <!-- BELI SEKARANG -->
                     <form action="{{ route('shop.bayar', $product->id) }}" method="POST">
                         @csrf
-                        <button type="submit" class="btn btn-success w-100">
+                        <button type="submit" class="btn btn-success w-100" {{ $product->stock < 1 ? 'disabled' : '' }}>
                             💳 Beli Sekarang
-                            
                         </button>
                     </form>
-
                 </div>
             </div>
         </div>
