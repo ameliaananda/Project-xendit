@@ -27,8 +27,11 @@ Route::post('/xendit/webhook', [XenditWebhookController::class, 'handle'])
 |--------------------------------------------------------------------------
 */
 Route::get('/', function () {
-    return view('welcome');
+    return redirect('/shop');
 });
+
+Route::get('/shop', [ProductController::class, 'shop'])
+    ->name('shop');
 
 
 /*
@@ -42,12 +45,6 @@ Route::middleware(['auth'])->group(function () {
         return redirect('/shop');
     })->name('dashboard');
 
-
-    // ===============================
-    // SHOP
-    // ===============================
-    Route::get('/shop', [ProductController::class, 'shop'])
-        ->name('shop');
 
     // [REFACTOR] "Beli Sekarang" — buat order + redirect ke checkout
     Route::post('/shop/bayar/{id}', [OrderController::class, 'buyNow'])
