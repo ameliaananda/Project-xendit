@@ -77,16 +77,15 @@ class ProductController extends Controller
     /**
      * Admin: Form edit produk.
      */
-    public function edit(string $id)
+    public function edit(Product $product)
     {
-        $product = Product::findOrFail($id);
         return view('admin.edit-product', compact('product'));
     }
 
     /**
      * Admin: Update data produk.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, Product $product)
     {
         $data = $request->validate([
             'name'        => 'required|string|max:255',
@@ -96,8 +95,6 @@ class ProductController extends Controller
             'description' => 'nullable|string',
             'image'       => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
-
-        $product = Product::findOrFail($id);
 
         if ($request->hasFile('image')) {
             if ($product->image) {
@@ -116,10 +113,8 @@ class ProductController extends Controller
     /**
      * Admin: Hapus produk.
      */
-    public function destroy(string $id)
+    public function destroy(Product $product)
     {
-        $product = Product::findOrFail($id);
-
         if ($product->image) {
             Storage::disk('public')->delete($product->image);
         }
